@@ -1,0 +1,29 @@
+# Python virtual environment
+.venv/
+__pycache__/
+*.pyc
+
+# Simulation generated files
+work/
+**/work/
+transcript
+**/transcript
+*.wlf
+*.vcd
+*.fsdb
+*.jou
+*.pb
+
+# Generated logs
+logs/
+*.log
+
+# Questa / ModelSim generated
+modelsim.ini
+**/modelsim.ini
+vsim_stacktrace.vstf
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode
