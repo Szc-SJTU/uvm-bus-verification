@@ -78,12 +78,23 @@ ic/
             run.do
             run_batch.do
 
+    axi2apb3_bridge_uvm/
+        rtl/ 
+        tb/ 
+        sim/ 
+            filelist.f 
+            run.do 
+            run_batch.do 
+            README.md
+
     scripts/
         run_one.py
         run_regression.py
 
     questa_lib_sv/
-        ...
+        .vscode/
+        rtl/
+        tb/
 ```
 
 ## Run
@@ -105,6 +116,13 @@ Run APB regression:
 ```bash
 python scripts/run_regression.py --project apb
 ```
+
+Run AXI2APB3 regression:
+
+```bash
+python scripts/run_regression.py --project axi2apb3
+```
+
 
 ## Simulation Scripts
 
@@ -139,3 +157,47 @@ The free Questa version used in this project has limitations on some advanced ve
 - Coverage is implemented with manual counters
 - Protocol checking is implemented with SVA property/assert checkers
 - Python scripts are used for simple regression automation and log-based PASS/FAIL summary
+
+### AXI2APB3 Bridge UVM
+
+A UVM-based verification environment for an AXI4-Lite to APB3-like bridge with multi-slave address decoding, APB wait-state support, decode-error handling, read-clear register behavior, and APB slave error propagation.
+
+The bridge supports:
+
+* AXI4-Lite single-beat read/write transactions
+* APB3-like slave interface with PREADY and PSLVERR
+* Four APB slave address regions
+* Legal and illegal address decoding
+* AXI SLVERR response generation for decode errors
+* APB PSLVERR propagation to AXI BRESP/RRESP
+* Read-clear register behavior on selected APB slave
+* APB wait-state insertion
+
+Verification features:
+
+* UVM transaction, sequence, driver, monitor, scoreboard, coverage, agent, environment, and test structure
+* AXI monitor with BRESP/RRESP collection
+* APB monitor with PSLVERR collection
+* Scoreboard checking for OKAY, decode-error, and slave-error paths
+* Multi-slave boundary address testing
+* Mixed legal/illegal address testing
+* AW/W timing skew testing
+* BREADY/RREADY backpressure testing
+* SVA assertions for AXI VALID/READY stability, APB setup/access phase, wait-state stability, and PSEL one-hot checking
+* Manual coverage counters for slave access, error paths, read-clear behavior, response backpressure, and APB wait-state
+* Python regression support with log-based PASS/FAIL summary
+
+AXI2APB3 testcases:
+
+* axi2apb_multi_slave_test
+* axi2apb_multi_slave_boundary_test
+* axi2apb_illegal_addr_test
+* axi2apb_mixed_addr_test
+* axi2apb_multi_slave_timing_test
+* axi2apb_read_clear_test
+* axi2apb_pslverr_test
+* axi2apb_v3_stress_test
+
+Current regression status:
+
+* AXI2APB3 Bridge: 8 / 8 PASS

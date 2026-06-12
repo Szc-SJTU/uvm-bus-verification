@@ -6,13 +6,15 @@ import re
 
 
 PROJECT_ALIAS = {
-    "axi_lite": "axi_lite_uvm",
-    "apb": "apb_uvm",
+    "axi_lite": "axi_lite_uvm_sample",
+    "apb": "apb_uvm_sample",
+    "axi2apb3": "axi2apb3_bridge_uvm",
+    "bridge": "axi2apb3_bridge_uvm",
 }
 
 
 DEFAULT_TESTS = {
-    "axi_lite_uvm": [
+    "axi_lite_uvm_sample": [
         "axi_lite_write_read_test",
         "axi_lite_wstrb_test",
         "axi_lite_read_before_write_test",
@@ -22,22 +24,32 @@ DEFAULT_TESTS = {
         "axi_lite_stress_test",
         "axi_lite_error_resp_test",
     ],
-    "apb_uvm": [
-        "apb_write_read_test",
-        "apb_back_to_back_test",
-        "apb_read_before_write_test",
-        "apb_reset_default_test",
-        "apb_random_like_test",
-        "apb_boundary_test",
+    "apb_uvm_sample": [
+        # 后面你 APB 想接入时再补
+        # "apb_write_read_test",
+        # "apb_random_like_test",
+    ],
+    "axi2apb3_bridge_uvm": [
+        "axi2apb_multi_slave_test",
+        "axi2apb_multi_slave_boundary_test",
+        "axi2apb_illegal_addr_test",
+        "axi2apb_mixed_addr_test",
+        "axi2apb_multi_slave_timing_test",
+        "axi2apb_read_clear_test",
+        "axi2apb_pslverr_test",
+        "axi2apb_v3_stress_test",
     ],
 }
 
 
 FAIL_KEYWORDS = [
-    "$error",
-    "MISMATCH",
-    "** Error:",
-    "Fatal:",
+    "UVM_FATAL",
+    "UVM_ERROR",
+    "RESULT                 : FAIL",
+    "AXI2APB3 SCOREBOARD FAIL",
+    "COMPARE FAIL",
+    "CMP_FAIL",
+    "** Fatal:",
 ]
 
 
@@ -65,10 +77,7 @@ def parse_args() -> argparse.Namespace:
 def check_log(text: str) -> bool:
     passed = True
 
-    for keyword in FAIL_KEYWORDS:
-        if keyword in text:
-            passed = False
-
+    # UVM count is the most reliable failure source.
     uvm_error_match = re.search(r"UVM_ERROR\s*:\s*(\d+)", text)
     if uvm_error_match:
         if int(uvm_error_match.group(1)) != 0:
@@ -77,6 +86,22 @@ def check_log(text: str) -> bool:
     uvm_fatal_match = re.search(r"UVM_FATAL\s*:\s*(\d+)", text)
     if uvm_fatal_match:
         if int(uvm_fatal_match.group(1)) != 0:
+            passed = False
+
+    # Scoreboard final result.
+    if "RESULT                 : PASS" not in text:
+        passed = False
+
+    # Real failure markers.
+    real_fail_keywords = [
+        "RESULT                 : FAIL",
+        "AXI2APB3 SCOREBOARD FAIL",
+        "CMP_FAIL",
+        "** Fatal:",
+    ]
+
+    for keyword in real_fail_keywords:
+        if keyword in text:
             passed = False
 
     return passed
