@@ -13,6 +13,8 @@ transcript
 *.fsdb
 *.jou
 *.pb
+*.ucdb
+*.vstf
 
 # Generated logs
 logs/
@@ -26,4 +28,4 @@ vsim_stacktrace.vstf
 # OS / editor
 .DS_Store
 Thumbs.db
-.vscode
+.vscode/
